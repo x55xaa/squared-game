@@ -25,6 +25,7 @@ from typing import Optional, override
 
 from ..modules import metadata
 from ..modules.parsing.parsers import MainArgumentParserTemplate
+from . import types
 
 
 logger = logging.getLogger(__name__)
@@ -54,7 +55,31 @@ class MainArgumentParser(MainArgumentParserTemplate):
         )
 
     def _extend_arguments(self) -> None:
-        pass
+        default_port: int = 7371
+
+        s_default_ip: str = 'localhost'
+        m_default_ip: str = 'lan'
+        
+        multiplayer_group = self.add_mutually_exclusive_group(required=False)
+
+        s_server_address: str = f'{s_default_ip}:{default_port}'
+        m_server_address: str = f'{m_default_ip}:{default_port}'
+        multiplayer_group.add_argument(
+            '-H', '--host',
+            const=m_server_address,
+            default=s_server_address,
+            help=f'host game on this address (default={m_server_address})',
+            metavar='ip[:port]',
+            nargs='?',
+            type=lambda a: types.network_address_with_optional_port(a, default_port),
+        )
+
+        multiplayer_group.add_argument(
+            '-c', '--connect',
+            help=f'connect to a server (default port={default_port})',
+            metavar='<ip[:port] | token>',
+            type=lambda a: types.connection_address(a, default_port),
+        )
 
     def _extend_subparsers(self) -> None:
         pass
@@ -67,6 +92,8 @@ class MainArgumentParser(MainArgumentParserTemplate):
     ) -> Namespace:
 
         namespace = super().parse_args(args=args, namespace=namespace)
-        # arguments = vars(namespace)
+
+        if namespace.connect and namespace.host:
+            namespace.host = None
 
         return namespace
