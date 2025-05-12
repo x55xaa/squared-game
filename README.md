@@ -1,5 +1,5 @@
 
-# 📦 python-tool
+# 📦 squared
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 ![Python version: 3.12+](https://img.shields.io/badge/python-3.12+-blue)
@@ -8,39 +8,35 @@
 
 ## Overview
 
-This project is a template for creating Python packages that follows the guidelines contained in [PEP 621](https://peps.python.org/pep-0621).
-It uses a `pyproject.toml` file to store build system requirements and package information.
+A small game about squares.
 
+This is a very little project that serves more as an exercise to figure out how
+to develop a simple Client-Server game.
 
-## Structure
-
-- `.github/worflows` contains GitHub actions used for building, testing, and publishing.
-- `docs` contains the package documentation, generated using Sphinx.
-- `src` contains the source code of the package.
-- `tests` contains pytest unit tests.
 
 ## Installation
 
-Install the package locally with `pip install`:
+Install the package from `PyPI` by running:
 
 ```bash
-$ pip install .
+$ pip install squared
 ```
 
 
 ## Usage
 
-This package offers a basic CLI to play around with.
-It can be launched by running:
+To launch the game in single player mode run the following command:
 
 ```bash
-$ python -m tool
+$ squared
 ```
 
-Or by invoking the `tool` [console script](https://setuptools.pypa.io/en/latest/userguide/entry_point.html#console-scripts).
+### Multiplayer
+
+Check out the documentation for more information on how to host and connect to online rooms.
 
 
 ## Documentation
 
-- [Official Documentation](https://x55xaa.github.io/python-tool)
-- [CHANGELOG](https://github.com/x55xaa/python-tool/blob/main/CHANGELOG.md)
+- [Official Documentation](https://x55xaa.github.io/squared-game)
+- [CHANGELOG](https://github.com/x55xaa/squared-game/blob/main/CHANGELOG.md)

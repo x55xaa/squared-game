@@ -5,8 +5,8 @@ requires = ["setuptools>=61.0", "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tool"
-description = "A barebone Python package template for CLI tools."
+name = "squared"
+description = "A game about squares."
 readme = "README.md"
 requires-python = ">=3.12"
 license = {file = "LICENSE"}
@@ -35,10 +35,10 @@ docs = ["myst_parser", "sphinx", "sphinx-argparse", "sphinx_autodoc_typehints", 
 testing = ["pylint", "pytest", "pytest-cov", "ruff", "tox"]
 
 [project.urls]
-"Github" = "https://github.com/x55xaa/python-tool"
+"Github" = "https://github.com/x55xaa/squared-game"
 
 [project.scripts]
-tool = "tool.__main__:main"
+squared = "squared.__main__:main"
 
 [tool.pylint.basic]
 include-naming-hint = true
