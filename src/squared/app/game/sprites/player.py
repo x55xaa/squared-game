@@ -60,7 +60,7 @@ class BasePlayer(ABC, BaseSprite):
         
     
     @abstractmethod
-    def update() -> None:
+    def update(self) -> None:
         ...
     
     @property

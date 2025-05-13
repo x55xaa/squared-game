@@ -1,6 +1,5 @@
 """Contains the packet definitions used by the game alongside some helper functions."""
 
-from copyreg import constructor
 # Copyright (C) 2025  Stefano Cuizza
 
 #     This program is free software: you can redistribute it and/or modify
