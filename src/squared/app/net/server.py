@@ -1,0 +1,156 @@
+"""Contains all the server-side logic."""
+
+# Copyright (C) 2025  Stefano Cuizza
+
+#     This program is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+from dataclasses import dataclass, field
+import logging
+from random import randint
+from socket import AF_INET, error as socket_error, SOCK_STREAM, socket
+import struct
+from threading import Thread
+from typing import Optional
+from uuid import UUID, uuid4
+
+from .filters import PacketFilter, whitelist_packets
+from .packet import Packet, PacketType, EmbeddedPacket, LeavePacket, JoinPacket
+from ..game.player import PlayerAttributes
+
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class TCPServer:
+    """"""
+
+    _connections: dict[socket, UUID] = field(default_factory=lambda: {}, init=False)
+    _state: dict[UUID, PlayerAttributes] = field(default_factory=lambda: {}, init=False)
+    address: (str, int)
+    backlog: Optional[int] = None
+    filters: list[PacketFilter] = field(
+        default_factory=lambda: [
+            whitelist_packets(PacketType.MESSAGE, PacketType.POSITION)
+        ],
+    )
+
+    def __post_init__(self):
+        if self.backlog is None:
+            self.backlog = 0
+
+    def start(self) -> None:
+        """"""
+
+        thread = Thread(target=TCPServer._handle_server, args=(self,))
+        thread.start()
+
+    def _forward_packet(self, source: socket, packet: Packet) -> None:
+        """"""
+
+        for s in self._connections:
+            if s != source:
+                s.sendall(packet.to_bytes())
+
+    def _init_player_attributes(self, identity: UUID) -> None:
+        self._state[identity] = PlayerAttributes(**{
+            'color': tuple(randint(127, 255) for _ in range(3)),
+            'position': (0, 0),
+        })
+
+    def _handle_server(self) -> None:
+        with socket(AF_INET, SOCK_STREAM) as s:
+            s.bind(self.address)
+            s.listen(self.backlog)
+
+            logger.info(
+                'binding on address %s (%d)',
+                '{}:{}'.format(*self.address), self.backlog
+            )
+
+            logging.info('game server started')
+
+            try:
+                while True:
+                    sock, addr = s.accept()
+                    new_identity: UUID = uuid4()
+                    self._connections[sock] = new_identity
+                    self._state[new_identity] = {}
+                    logger.info(
+                        'new connection from %s (%s)',
+                        '{}:{}'.format(*addr), new_identity,
+                    )
+
+                    thread = Thread(target=TCPServer._handle_client, args=(self, sock))
+                    thread.start()
+            finally:
+                logger.info('game server down')
+
+    def _handle_client(self, sock: socket) -> None:
+        identity: UUID = self._connections[sock]
+
+        self._init_player_attributes(identity)
+        join_packet = JoinPacket.from_attributes(self._state[identity])
+
+        self._forward_packet(
+            sock,
+            EmbeddedPacket.from_packet(identity, join_packet),
+        )
+
+        sock.sendall(EmbeddedPacket.from_packet(UUID(int=0), join_packet).to_bytes())
+
+        for other_identity, state in self._state.items():
+            if other_identity != identity:
+                join_packet = JoinPacket.from_attributes(state)
+                sock.sendall(EmbeddedPacket.from_packet(other_identity, join_packet).to_bytes())
+
+        try:
+            while True:
+                try:
+                    packet = Packet.from_socket(sock).parse()
+                except (struct.error, ValueError):
+                    logger.warning('discarding malformed packet from (%s)', identity)
+                    continue
+
+                for packet_filter in self.filters:
+                    if not packet_filter(packet):
+                        continue
+
+                match packet.type:
+                    case PacketType.POSITION:
+                        self._state[identity]['position'] = (packet.x, packet.y)
+
+                self._forward_packet(
+                    sock,
+                    EmbeddedPacket.from_packet(identity, packet),
+                )
+
+        except socket_error:
+            self._forward_packet(
+                sock,
+                EmbeddedPacket.from_packet(identity, LeavePacket.new()),
+            )
+
+        finally:
+            logger.info('connection closed (%d)', identity)
+
+            self._connections.pop(sock)
+            self._state.pop(identity)
+            sock.close()
+
+    def add_filter(self, packet_filter: PacketFilter) -> None:
+        """"""
+
+        self.filters.append(packet_filter)
