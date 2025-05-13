@@ -1,4 +1,4 @@
-"""Contains player definitions."""
+"""Contains player related classes."""
 
 # Copyright (C) 2025  Stefano Cuizza
 

@@ -113,7 +113,6 @@ def main(screen: Surface, fps: int) -> None:
 
         for p in PLAYERS.values():
             p.update()
-            print(p.__blit__)
             screen.blit(*p.__blit__)
 
         pygame.display.update()
