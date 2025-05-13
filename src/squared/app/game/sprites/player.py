@@ -17,7 +17,6 @@
 
 
 from abc import ABC, abstractmethod
-import logging
 from typing import TypedDict, Optional, Union
 from uuid import UUID
 
@@ -30,8 +29,6 @@ type PlayerColor = tuple[int, int, int]
 type PlayerPosition = tuple[int, int]
 type PlayerVelocity = tuple[float, float]
 
-
-logger = logging.getLogger(__name__)
 
 PLAYERS: dict[UUID, Union['MainPlayer', 'RemotePlayer']] = {}
 

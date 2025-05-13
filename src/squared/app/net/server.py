@@ -76,32 +76,31 @@ class TCPServer:
             s.listen(self.backlog)
 
             logger.info(
-                'binding on address %s (%d)',
+                'binding on address %s (%d).',
                 '{}:{}'.format(*self.address), self.backlog
             )
 
-            logging.info('game server started')
+            logging.info('game server started.')
 
             try:
                 while True:
                     sock, addr = s.accept()
                     new_identity: UUID = uuid4()
                     self._connections[sock] = new_identity
-                    self._state[new_identity] = {}
                     logger.info(
-                        'new connection from %s (%s)',
+                        'new connection from %s (%s).',
                         '{}:{}'.format(*addr), new_identity,
                     )
 
                     thread = Thread(target=TCPServer._handle_client, args=(self, sock))
                     thread.start()
             finally:
-                logger.info('game server down')
+                logger.info('game server down.')
 
     def _handle_client(self, sock: socket) -> None:
         identity: UUID = self._connections[sock]
         
-        logger.debug('player (%s) has joined the server', identity)
+        logger.debug('player (%s) has joined the server.', identity)
 
         self._init_player_attributes(identity)
         join_packet = JoinPacket.from_attributes(self._state[identity])
@@ -123,20 +122,20 @@ class TCPServer:
                 try:
                     packet = Packet.from_socket(sock).parse()
                 except (struct.error, ValueError):
-                    logger.warning('discarding malformed packet from (%s)', identity)
+                    logger.warning('discarding malformed packet from (%s).', identity)
                     continue
                 
-                logger.debug('received packet from (%s) %r', identity, packet)
+                logger.debug('received packet from (%s) %r.', identity, packet)
 
                 for packet_filter in self.filters:
                     if not packet_filter(packet):
-                        logger.debug('packet filtered (%s) %r', identity, packet)
+                        logger.debug('packet filtered (%s) %r.', identity, packet)
                         
                         continue
 
                 match packet.type:
                     case PacketType.POSITION:
-                        logger.debug('update player (%s) position (%d, %d) -> (%d, %d)', identity, *self._state[identity]['position'], packet.x, packet.y)
+                        logger.debug('update player (%s) position (%d, %d) -> (%d, %d).', identity, *self._state[identity]['position'], packet.x, packet.y)
                         self._state[identity]['position'] = (packet.x, packet.y)
 
                 self._forward_packet(
@@ -151,7 +150,7 @@ class TCPServer:
             )
 
         finally:
-            logger.info('connection closed (%d)', identity)
+            logger.info('connection closed (%d).', identity)
 
             self._connections.pop(sock)
             self._state.pop(identity)

@@ -68,7 +68,7 @@ class TCPClient:
                 try:
                     packet = Packet.from_socket(sock).parse()
                 except (struct.error, ValueError):
-                    logger.warning('discarding malformed packet')
+                    logger.warning('discarding malformed packet.')
 
                     continue
                 
@@ -81,25 +81,25 @@ class TCPClient:
                 try:
                     packet: Packet = packet.embed.parse()
                 except (struct.error, ValueError):
-                    logger.warning('discarding malformed packet from (%s)', source_identity)
+                    logger.warning('discarding malformed packet from (%s).', source_identity)
 
                     continue
                 
-                logger.debug('received packet from (%s) %r', source_identity, packet)
+                logger.debug('received packet from (%s) %r.', source_identity, packet)
 
                 for callback in self.callbacks:
                     if (packet := callback(source_identity, packet)) is None:
                         break
 
         finally:
-            logger.info('connection closed')
+            logger.info('connection closed.')
             sock.close()
 
     def _handle_outbound_packets(self, sock: socket) -> None:
         while True:
             outbound_pkt: Packet = self._outbound_packets_queue.get()
             
-            logger.debug('sent packet %r', outbound_pkt)
+            logger.debug('sent packet %r.', outbound_pkt)
 
             sock.sendall(outbound_pkt.to_bytes())
 
