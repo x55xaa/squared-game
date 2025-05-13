@@ -26,11 +26,47 @@ from pygame import Surface
 from ...modules import metadata
 from ..net.client import TCPClient
 from ..net.callbacks import on_player_join, on_player_leave, on_player_move
-from . import player
-from .player import MainPlayer, PLAYERS, player_join, player_leave, player_move
+from .sprites import player
+from .sprites.player import MainPlayer, PlayerAttributes, PlayerPosition, player_join, player_leave, player_move, RemotePlayer
 
 
 logger = logging.getLogger(__name__)
+
+PLAYERS: dict[UUID, MainPlayer | RemotePlayer] = {}
+
+
+def get_main_player() -> MainPlayer:
+    """"""
+    
+    return PLAYERS[UUID(int=0)]
+
+
+def on_player_join_action(identity: UUID, attributes: PlayerAttributes) -> None:
+    """"""
+    
+    if int(identity) == 0:
+        PLAYERS[identity].set_attributes(attributes)
+    else:
+        PLAYERS[identity] = RemotePlayer(**attributes)
+
+
+def on_player_leave_action(identity: UUID) -> None:
+    """"""
+    
+    if int(identity) == 0:
+        return
+
+    PLAYERS.pop(identity, None)
+
+
+def on_player_move_action(identity: UUID, position: PlayerPosition) -> None:
+    """"""
+    
+    if int(identity) == 0:
+        return
+
+    if player := PLAYERS.get(identity):
+        player.set_position(*position)
 
 
 def init(title: str, size: tuple[int, int]) -> Surface:
@@ -60,36 +96,39 @@ def main(screen: Surface, fps: int) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
-                    PLAYERS[UUID(int=0)].set_velocity(y=-200 * dt)
+                    get_main_player().set_velocity(y=-200 * dt)
                 elif event.key == pygame.K_s:
-                    PLAYERS[UUID(int=0)].set_velocity(y=200 * dt)
+                    get_main_player().set_velocity(y=200 * dt)
                 elif event.key == pygame.K_a:
-                    PLAYERS[UUID(int=0)].set_velocity(x=-200 * dt)
+                    get_main_player().set_velocity(x=-200 * dt)
                 elif event.key == pygame.K_d:
-                    PLAYERS[UUID(int=0)].set_velocity(x=200 * dt)
+                    get_main_player().set_velocity(x=200 * dt)
+            
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_w or event.key == pygame.K_s:
-                    PLAYERS[UUID(int=0)].set_velocity(y=0)
+                    get_main_player().set_velocity(y=0)
                 elif event.key == pygame.K_a or event.key == pygame.K_d:
-                    PLAYERS[UUID(int=0)].set_velocity(x=0)
+                    get_main_player().set_velocity(x=0)
 
         for p in PLAYERS.values():
             p.update()
-            screen.blit(p.image, p.rect)
+            print(p.__blit__)
+            screen.blit(*p.__blit__)
 
-        pygame.display.update()  # Or pygame.display.flip()
-
+        pygame.display.update()
+    
 
 def run(client: TCPClient) -> None:
     """"""
 
     PLAYERS[UUID(int=0)] = MainPlayer(client)
 
-    client.add_callback(on_player_join(player_join))
-    client.add_callback(on_player_leave(player_leave))
-    client.add_callback(on_player_move(player_move))
+    client.add_callback(on_player_join(on_player_join_action))
+    client.add_callback(on_player_leave(on_player_leave_action))
+    client.add_callback(on_player_move(on_player_move_action))
 
     client.start()
 

@@ -21,7 +21,7 @@ from collections.abc import Callable
 from uuid import UUID
 
 from .packet import Packet, JoinPacket, LeavePacket, PositionPacket
-from ..game.player import PlayerAttributes, PlayerPosition
+from ..game.sprites.player import PlayerAttributes, PlayerPosition
 
 
 type ClientCallback = Callable[[UUID, Packet], Packet | None]

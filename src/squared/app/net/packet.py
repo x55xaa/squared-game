@@ -23,7 +23,7 @@ import struct
 from typing import Self
 from uuid import UUID
 
-from squared.app.game.player import PlayerAttributes
+from ..game.sprites.player import PlayerAttributes
 
 
 class PacketType(IntEnum):
@@ -70,8 +70,6 @@ class Packet:
         packet_data = stream.recv(packet_length)
         if not packet_data or len(packet_data) != packet_length:
             raise socket_error
-
-        print(packet_type, packet_length, packet_data)
 
         return cls(packet_type, packet_length, packet_data)
 

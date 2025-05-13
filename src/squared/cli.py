@@ -35,19 +35,20 @@ def main(namespace: Namespace) -> None:
           Namespace containing the command line parsing.
     """
 
+
     if namespace.connect:
         server_address = str(namespace.connect[0]), namespace.connect[1]
 
         game_client = TCPClient(server_address)
         game.run(game_client)
 
-
-
-    elif namespace.host:
+    if namespace.host:
         server_address = str(namespace.host[0]), namespace.host[1]
 
         game_server = TCPServer(server_address)
         game_server.start()
-
-        game_client = TCPClient(server_address)
-        game.run(game_client)
+    elif namespace.connect:
+        server_address = str(namespace.connect[0]), namespace.connect[1]
+        
+    game_client = TCPClient(server_address)
+    game.run(game_client)

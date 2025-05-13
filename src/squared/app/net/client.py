@@ -27,6 +27,7 @@ from uuid import UUID
 from .callbacks import ClientCallback
 from .packet import Packet, EmbeddedPacket, PositionPacket
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -84,7 +85,7 @@ class TCPClient:
 
                     continue
                 
-                print(source_identity, repr(packet))
+                logger.debug('received packet from (%s) %r', source_identity, packet)
 
                 for callback in self.callbacks:
                     if (packet := callback(source_identity, packet)) is None:
@@ -97,6 +98,8 @@ class TCPClient:
     def _handle_outbound_packets(self, sock: socket) -> None:
         while True:
             outbound_pkt: Packet = self._outbound_packets_queue.get()
+            
+            logger.debug('sent packet %r', outbound_pkt)
 
             sock.sendall(outbound_pkt.to_bytes())
 

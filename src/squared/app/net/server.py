@@ -27,7 +27,7 @@ from uuid import UUID, uuid4
 
 from .filters import PacketFilter, whitelist_packets
 from .packet import Packet, PacketType, EmbeddedPacket, LeavePacket, JoinPacket
-from ..game.player import PlayerAttributes
+from ..game.sprites.player import PlayerAttributes
 
 
 logger = logging.getLogger(__name__)
@@ -100,6 +100,8 @@ class TCPServer:
 
     def _handle_client(self, sock: socket) -> None:
         identity: UUID = self._connections[sock]
+        
+        logger.debug('player (%s) has joined the server', identity)
 
         self._init_player_attributes(identity)
         join_packet = JoinPacket.from_attributes(self._state[identity])
@@ -123,13 +125,18 @@ class TCPServer:
                 except (struct.error, ValueError):
                     logger.warning('discarding malformed packet from (%s)', identity)
                     continue
+                
+                logger.debug('received packet from (%s) %r', identity, packet)
 
                 for packet_filter in self.filters:
                     if not packet_filter(packet):
+                        logger.debug('packet filtered (%s) %r', identity, packet)
+                        
                         continue
 
                 match packet.type:
                     case PacketType.POSITION:
+                        logger.debug('update player (%s) position (%d, %d) -> (%d, %d)', identity, *self._state[identity]['position'], packet.x, packet.y)
                         self._state[identity]['position'] = (packet.x, packet.y)
 
                 self._forward_packet(
