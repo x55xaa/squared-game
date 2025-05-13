@@ -27,6 +27,7 @@ classifiers = [
 ]
 dependencies = [
     "colorama",
+    "pygame",
 ]
 dynamic = ["version"]
 
