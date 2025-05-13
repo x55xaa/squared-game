@@ -66,7 +66,7 @@ class TCPServer:
 
     def _init_player_attributes(self, identity: UUID) -> None:
         self._state[identity] = PlayerAttributes(**{
-            'color': tuple(randint(127, 255) for _ in range(3)),
+            'color': tuple(randint(64, 255) for _ in range(3)),
             'position': (0, 0),
         })
 
