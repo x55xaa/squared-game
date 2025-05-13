@@ -70,12 +70,21 @@ class TCPClient:
                     logger.warning('discarding malformed packet')
 
                     continue
+                
 
                 if not isinstance(packet, EmbeddedPacket):
                     continue
 
                 source_identity: UUID = packet.identity
-                packet: Packet = packet.embed
+                
+                try:
+                    packet: Packet = packet.embed.parse()
+                except (struct.error, ValueError):
+                    logger.warning('discarding malformed packet from (%s)', source_identity)
+
+                    continue
+                
+                print(source_identity, repr(packet))
 
                 for callback in self.callbacks:
                     if (packet := callback(source_identity, packet)) is None:

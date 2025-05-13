@@ -58,11 +58,11 @@ class Player(Sprite):
     def set_position(self, x: Optional[int] = None, y: Optional[int] = None) -> None:
         """"""
 
-        if x and y:
+        if x is not None and y is not None:
             self._position = (x, y)
-        elif x:
+        elif x is not None:
             self._position = (x, self._position[1])
-        elif y:
+        elif y is not None:
             self._position = (self._position[0], y)
 
     @property
@@ -108,6 +108,7 @@ class MainPlayer(Sprite):
 
     def set_attributes(self, attributes: PlayerAttributes) -> None:
         """"""
+        print('set')
 
         self._image.fill(attributes['color'])
         self._rect.move(*attributes['position'])
@@ -121,11 +122,11 @@ class MainPlayer(Sprite):
     def set_velocity(self, x: Optional[float] = None, y: Optional[float] = None) -> None:
         """"""
 
-        if x and y:
+        if x is not None and y is not None:
             self._velocity = (x, y)
-        elif x:
+        elif x is not None:
             self._velocity = (x, self._velocity[1])
-        elif y:
+        elif y is not None:
             self._velocity = (self._velocity[0], y)
 
     @property
@@ -155,6 +156,9 @@ class MainPlayer(Sprite):
 
 def player_join(identity: UUID, attributes: PlayerAttributes) -> None:
     """"""
+    
+    print('PLAYER JOIN')
+    print(identity, attributes)
 
     if int(identity) == 0:
         PLAYERS[identity].set_attributes(attributes)
