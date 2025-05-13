@@ -20,14 +20,12 @@ import logging
 from uuid import UUID
 
 import pygame
-from colorama.ansi import clear_line
 from pygame import Surface
 
 from ...modules import metadata
 from ..net.client import TCPClient
 from ..net.callbacks import on_player_join, on_player_leave, on_player_move
-from .sprites import player
-from .sprites.player import MainPlayer, PlayerAttributes, PlayerPosition, player_join, player_leave, player_move, RemotePlayer
+from .sprites.player import MainPlayer, PlayerAttributes, PlayerPosition, RemotePlayer
 
 
 logger = logging.getLogger(__name__)
