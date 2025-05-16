@@ -37,19 +37,15 @@ logger = logging.getLogger(__name__)
 class TCPServer:
     """"""
 
+    _backlog: int = field(default_factory=lambda: 16, init=False)
     _connections: dict[socket, UUID] = field(default_factory=lambda: {}, init=False)
     _state: dict[UUID, PlayerAttributes] = field(default_factory=lambda: {}, init=False)
     address: (str, int)
-    backlog: Optional[int] = None
     filters: list[PacketFilter] = field(
         default_factory=lambda: [
             whitelist_packets(PacketType.MESSAGE, PacketType.POSITION)
         ],
     )
-
-    def __post_init__(self):
-        if self.backlog is None:
-            self.backlog = 0
 
     def start(self) -> None:
         """"""
@@ -73,11 +69,11 @@ class TCPServer:
     def _handle_server(self) -> None:
         with socket(AF_INET, SOCK_STREAM) as s:
             s.bind(self.address)
-            s.listen(self.backlog)
+            s.listen(self._backlog)
 
             logger.info(
                 'binding on address %s (%d).',
-                '{}:{}'.format(*self.address), self.backlog
+                '{}:{}'.format(*self.address), self._backlog
             )
 
             logging.info('game server started.')
