@@ -99,6 +99,8 @@ class RemotePlayer(BasePlayer):
         self._surface.fill(color)
         self._rect = self._surface.get_rect()
 
+        self.__blit__ = [self._surface, self._rect]
+
     def update(self) -> bool:
         """"""
 
@@ -151,11 +153,15 @@ class MainPlayer(BasePlayer):
     def set_attributes(self, attributes: PlayerAttributes) -> None:
         """"""
 
+        print(attributes)
+
         self._surface = Surface(attributes['size'])
         self._surface.fill(attributes['color'])
 
         self._rect = self._surface.get_rect()
         self._rect.move(*attributes['position'])
+
+        self.__blit__ = [self._surface, self._rect]
         
     def set_velocity(self, x: Optional[float] = None, y: Optional[float] = None) -> None:
         """"""
