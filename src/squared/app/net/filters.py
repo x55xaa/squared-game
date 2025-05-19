@@ -20,7 +20,7 @@
 from collections.abc import Callable
 from pygame import Rect
 
-from ..game.sprites.player import PLAYER_BOUNDS
+from ..game.main import BOUNDS
 from .packet import Packet, PacketType
 
 type PacketFilter = Callable[[Packet], bool]
@@ -62,8 +62,8 @@ def position_filter(left: int, top: int, w: int, h: int) -> PacketFilter:
             return True
 
         bounds = Rect(left, top, w, h)
-        print(bounds, Rect(pkt.x, pkt.y, *PLAYER_BOUNDS))
-        if bounds.contains(Rect(pkt.x, pkt.y, *PLAYER_BOUNDS)):
+        print(bounds, Rect(pkt.x, pkt.y, *BOUNDS))
+        if bounds.contains(Rect(pkt.x, pkt.y, *BOUNDS)):
             return True
 
         return False

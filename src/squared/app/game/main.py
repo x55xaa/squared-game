@@ -17,6 +17,7 @@
 
 
 import logging
+from typing import Final
 from uuid import UUID
 
 import pygame
@@ -30,6 +31,7 @@ from .sprites.player import MainPlayer, PlayerAttributes, PlayerPosition, Remote
 
 logger = logging.getLogger(__name__)
 
+BOUNDS: Final[tuple[int, int]] = (720, 480)
 PLAYERS: dict[UUID, MainPlayer | RemotePlayer] = {}
 
 
@@ -130,6 +132,6 @@ def run(client: TCPClient) -> None:
     client.start()
 
     window_title: str = f'{metadata.package().capitalize()} - v{metadata.version()}'
-    screen = init(window_title, (720, 480))
+    screen = init(window_title, BOUNDS)
 
     main(screen, 60)
