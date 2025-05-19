@@ -26,8 +26,8 @@ from uuid import UUID, uuid4
 
 from .filters import PacketFilter, position_filter, whitelist_packets
 from .packet import Packet, PacketType, EmbeddedPacket, LeavePacket, JoinPacket
-from ..game.main import BOUNDS, PLAYERS_SIZE
-from ..game.sprites.player import PlayerAttributes
+from ..game.main import BOUNDS
+from ..game.sprites.player import PLAYER_SIZE, PlayerAttributes
 
 
 logger = logging.getLogger(__name__)
@@ -65,7 +65,7 @@ class TCPServer:
         self._state[identity] = PlayerAttributes(**{
             'color': tuple(randint(64, 255) for _ in range(3)),
             'position': (0, 0),
-            'size': PLAYERS_SIZE,
+            'size': PLAYER_SIZE,
         })
 
     def _handle_server(self) -> None:

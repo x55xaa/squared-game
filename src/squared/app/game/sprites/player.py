@@ -17,7 +17,8 @@
 
 
 from abc import ABC, abstractmethod
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, Union
+from uuid import UUID
 
 from pygame import Surface, Rect
 
@@ -29,6 +30,10 @@ type PlayerColor = tuple[int, int, int]
 type PlayerPosition = tuple[int, int]
 type PlayerSize = tuple[int, int]
 type PlayerVelocity = tuple[float, float]
+
+
+PLAYERS: dict[UUID, Union['MainPlayer', 'RemotePlayer']] = {}
+PLAYER_SIZE: PlayerSize = (32, 32)
 
 
 class PlayerAttributes(TypedDict):
