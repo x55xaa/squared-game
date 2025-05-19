@@ -26,13 +26,14 @@ from pygame import Surface
 from ...modules import metadata
 from ..net.client import TCPClient
 from ..net.callbacks import on_player_join, on_player_leave, on_player_move
-from .sprites.player import MainPlayer, PlayerAttributes, PlayerPosition, RemotePlayer
+from .sprites.player import MainPlayer, PlayerAttributes, PlayerPosition, PlayerSize, RemotePlayer
 
 
 logger = logging.getLogger(__name__)
 
 BOUNDS: Final[tuple[int, int]] = (720, 480)
 PLAYERS: dict[UUID, MainPlayer | RemotePlayer] = {}
+PLAYERS_SIZE: PlayerSize = (32, 32)
 
 
 def get_main_player() -> MainPlayer:
@@ -91,6 +92,7 @@ def main(screen: Surface, fps: int) -> None:
     running = True
     while running:
         dt = clock.tick(fps) / 1000
+
         screen.fill((0, 0, 0))
 
         for event in pygame.event.get():
