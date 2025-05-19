@@ -22,6 +22,7 @@ import logging
 from .app.net.client import TCPClient
 from .app.net.server import TCPServer
 from .app.game import main as game
+from .token import stoken_encode
 
 
 logger = logging.getLogger(__name__)
@@ -43,6 +44,8 @@ def main(namespace: Namespace) -> None:
         game.run(game_client)
 
     if namespace.host:
+        print(f'SERVER TOKEN: {stoken_encode(namespace.host[0], namespace.host[1], default_port=7173)}.')
+
         server_address = str(namespace.host[0]), namespace.host[1]
 
         game_server = TCPServer(server_address)
