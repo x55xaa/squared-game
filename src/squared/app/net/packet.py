@@ -194,7 +194,8 @@ class JoinPacket(Packet):
 
         packet_data: bytes = (
             struct.pack('>3B', *attributes['color']) +
-            struct.pack('>2H', *attributes['position'])
+            struct.pack('>2H', *attributes['position']) +
+            struct.pack('>2B', *attributes['size'])
         )
 
         return cls(PacketType.JOIN, len(packet_data), packet_data)
