@@ -102,7 +102,7 @@ class RemotePlayer(BasePlayer):
     def update(self) -> bool:
         """"""
 
-        if self.update():
+        if super().update():
             self._rect.move_ip(self._position[0] - self.x, self._position[1] - self.y)
 
             return True
@@ -136,7 +136,7 @@ class MainPlayer(BasePlayer):
     def update(self) -> bool:
         """"""
 
-        if self.update():
+        if super().update():
             self._rect.move_ip(*self._velocity)
 
             if self._prev_position != (self.x, self.y):
