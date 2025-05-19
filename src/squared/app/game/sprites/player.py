@@ -45,10 +45,12 @@ class PlayerAttributes(TypedDict):
 class BasePlayer(ABC, BaseSprite):
     """"""
 
-    def __init__(self, bounds: PlayerBounds):
+    def __init__(self, identity: UUID, bounds: PlayerBounds):
         """"""
 
         super().__init__()
+
+        self._identity = identity
 
         self._surface = Surface((0, 0))
         self._surface.fill((0, 0, 0))
@@ -90,10 +92,10 @@ class BasePlayer(ABC, BaseSprite):
 class RemotePlayer(BasePlayer):
     """"""
 
-    def __init__(self, bounds: PlayerBounds, color: PlayerColor, position: PlayerPosition, size: PlayerSize):
+    def __init__(self, identity: UUID, bounds: PlayerBounds, color: PlayerColor, position: PlayerPosition, size: PlayerSize):
         """"""
 
-        super().__init__(bounds)
+        super().__init__(identity, bounds)
 
         self._position: PlayerPosition = position
 
@@ -127,10 +129,10 @@ class RemotePlayer(BasePlayer):
 class MainPlayer(BasePlayer):
     """"""
 
-    def __init__(self, bounds: PlayerBounds, client):
+    def __init__(self, identity: UUID, bounds: PlayerBounds, client):
         """"""
 
-        super().__init__(bounds)
+        super().__init__(identity, bounds)
 
         self._client = client
 
