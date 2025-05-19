@@ -22,7 +22,6 @@ from random import randint
 from socket import AF_INET, error as socket_error, SOCK_STREAM, socket
 import struct
 from threading import Thread
-from typing import Optional
 from uuid import UUID, uuid4
 
 from .filters import PacketFilter, position_filter, whitelist_packets
