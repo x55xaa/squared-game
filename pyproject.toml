@@ -10,7 +10,7 @@ description = "A game about squares."
 readme = "README.md"
 requires-python = ">=3.12"
 license = {file = "LICENSE"}
-keywords = ["template"]
+keywords = ["game", "pygame", "squares"]
 authors = [
     { name = "Stefano Cuizza", email = "stefano.cuizza@protonmail.com" },
 ]
