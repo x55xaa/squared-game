@@ -1,6 +1,7 @@
-tool
-====
+squared
+=======
 
 .. argparse::
-    :module: tool.parsers.main
+    :module: squared.parsers.main
     :func: _construct
+    :nodefault:
