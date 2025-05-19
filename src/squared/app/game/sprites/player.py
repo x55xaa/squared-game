@@ -122,8 +122,16 @@ class RemotePlayer(BasePlayer):
         else:
             new_position = self._position
 
-        if self._bounds.contains(Rect(*new_position, *self._surface.get_size())):
-            self._position = new_position
+        new_rect = Rect(*new_position, *self._surface.get_size())
+        if self._bounds.contains(new_rect):
+            for identity, player in PLAYERS.items():
+                if identity == self._identity:
+                    continue
+
+                if new_rect.colliderect(player.rect):
+                    break
+            else:
+                self._position = new_position
 
 
 class MainPlayer(BasePlayer):
@@ -142,14 +150,21 @@ class MainPlayer(BasePlayer):
     def update(self) -> None:
         """"""
 
-        if self._bounds.contains(Rect(self.x + self._velocity[0], self.y + self._velocity[1], *self._surface.get_size())):
+        new_rect = Rect(self.x + self._velocity[0], self.y + self._velocity[1], *self._surface.get_size())
+        if self._bounds.contains(new_rect):
+            for identity, player in PLAYERS.items():
+                if identity == self._identity:
+                    continue
 
-            self._rect.move_ip(*self._velocity)
+                if new_rect.colliderect(player.rect):
+                    break
+            else:
+                self._rect.move_ip(*self._velocity)
 
-            if self._prev_position != (self.x, self.y):
-                self._client.update_position(self.x, self.y)
+                if self._prev_position != (self.x, self.y):
+                    self._client.update_position(self.x, self.y)
 
-                self._prev_position = (self.x, self.y)
+                    self._prev_position = (self.x, self.y)
     
     def set_attributes(self, attributes: PlayerAttributes) -> None:
         """"""
@@ -174,5 +189,13 @@ class MainPlayer(BasePlayer):
         else:
             new_velocity = self._velocity
 
-        if self._bounds.contains(Rect(self.x + new_velocity[0], self.y + new_velocity[1], *self._surface.get_size())):
-            self._velocity = new_velocity
+        new_rect = Rect(self.x + new_velocity[0], self.y + new_velocity[1], *self._surface.get_size())
+        if self._bounds.contains(new_rect):
+            for identity, player in PLAYERS.items():
+                if identity == self._identity:
+                    continue
+
+                if new_rect.colliderect(player.rect):
+                    break
+            else:
+                self._velocity = new_velocity
