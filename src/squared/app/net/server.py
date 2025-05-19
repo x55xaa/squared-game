@@ -25,8 +25,9 @@ from threading import Thread
 from typing import Optional
 from uuid import UUID, uuid4
 
-from .filters import PacketFilter, whitelist_packets
+from .filters import PacketFilter, position_filter, whitelist_packets
 from .packet import Packet, PacketType, EmbeddedPacket, LeavePacket, JoinPacket
+from ..game.main import BOUNDS
 from ..game.sprites.player import PlayerAttributes
 
 
@@ -43,7 +44,8 @@ class TCPServer:
     address: (str, int)
     filters: list[PacketFilter] = field(
         default_factory=lambda: [
-            whitelist_packets(PacketType.MESSAGE, PacketType.POSITION)
+            whitelist_packets(PacketType.MESSAGE, PacketType.POSITION),
+            position_filter(0, 0, *BOUNDS),
         ],
     )
 
@@ -127,17 +129,21 @@ class TCPServer:
                     if not packet_filter(packet):
                         logger.debug('packet filtered (%s) %r.', identity, packet)
                         
-                        continue
+                        break
+                else:
+                    match packet.type:
+                        case PacketType.POSITION:
+                            logger.debug(
+                                'update player (%s) position (%d, %d) -> (%d, %d).',
+                                identity, *self._state[identity]['position'], packet.x, packet.y
+                            )
 
-                match packet.type:
-                    case PacketType.POSITION:
-                        logger.debug('update player (%s) position (%d, %d) -> (%d, %d).', identity, *self._state[identity]['position'], packet.x, packet.y)
-                        self._state[identity]['position'] = (packet.x, packet.y)
+                            self._state[identity]['position'] = (packet.x, packet.y)
 
-                self._forward_packet(
-                    sock,
-                    EmbeddedPacket.from_packet(identity, packet),
-                )
+                    self._forward_packet(
+                        sock,
+                        EmbeddedPacket.from_packet(identity, packet),
+                    )
 
         except socket_error:
             self._forward_packet(

@@ -18,9 +18,10 @@
 
 
 from collections.abc import Callable
+from pygame import Rect
 
+from ..game.sprites.player import PLAYER_BOUNDS
 from .packet import Packet, PacketType
-
 
 type PacketFilter = Callable[[Packet], bool]
 
@@ -41,3 +42,30 @@ def whitelist_packets(*args: PacketType) -> PacketFilter:
 
     return packet_filter
 
+
+def position_filter(left: int, top: int, w: int, h: int) -> PacketFilter:
+    """Returns a packet filter that allows only position inside a certain perimeter.
+
+    Args:
+        left:
+            the x coordinate of the top left corner of the perimeter.
+        top:
+            the y coordinate of the top left corner of the perimeter.
+        w:
+            the width of the perimeter.
+        h:
+            the height of the perimeter.
+    """
+
+    def packet_filter(pkt: Packet) -> bool:
+        if pkt.type != PacketType.POSITION:
+            return True
+
+        bounds = Rect(left, top, w, h)
+        print(bounds, Rect(pkt.x, pkt.y, *PLAYER_BOUNDS))
+        if bounds.contains(Rect(pkt.x, pkt.y, *PLAYER_BOUNDS)):
+            return True
+
+        return False
+
+    return packet_filter
