@@ -35,9 +35,6 @@ $ squared
 
 Check out the documentation for more information on how to host and connect to online rooms.
 
-> [!TIP]
-> Run `squared -h` to see all the available features.
-
 
 ## Documentation
 
