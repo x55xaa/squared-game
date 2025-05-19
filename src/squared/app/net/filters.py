@@ -62,7 +62,6 @@ def position_filter(left: int, top: int, w: int, h: int) -> PacketFilter:
             return True
 
         bounds = Rect(left, top, w, h)
-        print(bounds, Rect(pkt.x, pkt.y, *BOUNDS))
         if bounds.contains(Rect(pkt.x, pkt.y, *BOUNDS)):
             return True
 
