@@ -16,7 +16,6 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from abc import ABC, abstractmethod
 from typing import TypedDict, Optional, Union
 from uuid import UUID
 
@@ -37,12 +36,14 @@ PLAYER_SIZE: PlayerSize = (32, 32)
 
 
 class PlayerAttributes(TypedDict):
+    """A player's attributes."""
+
     color: PlayerColor
     position: PlayerPosition
     size: PlayerSize
 
 
-class BasePlayer(ABC, BaseSprite):
+class BasePlayer(BaseSprite):
     """Base player class."""
 
     def __init__(self, identity: UUID, bounds: PlayerBounds):
@@ -60,14 +61,10 @@ class BasePlayer(ABC, BaseSprite):
         self._surface = Surface((0, 0))
         self._surface.fill((0, 0, 0))
         self._rect = self._surface.get_rect()
-        
-        self._bounds = Rect(*bounds)
-        
-        self.__blit__ = [self._surface, self._rect]
 
-    @abstractmethod
-    def update(self) -> None:
-        ...
+        self._bounds = Rect(*bounds)
+
+        self.__blit__ = [self._surface, self._rect]
 
     @property
     def surface(self) -> Surface:
@@ -121,8 +118,10 @@ class RemotePlayer(BasePlayer):
 
         self.__blit__ = [self._surface, self._rect]
 
-    def update(self) -> None:
+    def update(self, *args, **kwargs) -> None:
         """Updates the player's position."""
+
+        super().update(*args, **kwargs)
 
         self._rect.move_ip(self._position[0] - self.x, self._position[1] - self.y)
 
@@ -170,8 +169,10 @@ class MainPlayer(BasePlayer):
         self._prev_position = (0, 0)
         self._velocity: PlayerVelocity = (0 ,0)
 
-    def update(self) -> None:
+    def update(self, *args, **kwargs) -> None:
         """Updates the player's position."""
+
+        super().update(*args, **kwargs)
 
         new_rect = Rect(self.x + self._velocity[0], self.y + self._velocity[1], *self._surface.get_size())
         if self._bounds.contains(new_rect):
@@ -188,7 +189,7 @@ class MainPlayer(BasePlayer):
                     self._client.update_position(self.x, self.y)
 
                     self._prev_position = (self.x, self.y)
-    
+
     def set_attributes(self, attributes: PlayerAttributes) -> None:
         """Sets the player's attributes."""
 

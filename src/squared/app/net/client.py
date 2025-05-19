@@ -85,20 +85,19 @@ class TCPClient:
                     logger.warning('discarding malformed packet.')
 
                     continue
-                
 
                 if not isinstance(packet, EmbeddedPacket):
                     continue
 
                 source_identity: UUID = packet.identity
-                
+
                 try:
                     packet: Packet = packet.embed.parse()
                 except (struct.error, ValueError):
                     logger.warning('discarding malformed packet from (%s).', source_identity)
 
                     continue
-                
+
                 logger.debug('received packet from (%s) %r.', source_identity, packet)
 
                 for callback in self.callbacks:
@@ -112,7 +111,7 @@ class TCPClient:
     def _handle_outbound_packets(self, sock: socket) -> None:
         while True:
             outbound_pkt: Packet = self._outbound_packets_queue.get()
-            
+
             logger.debug('sent packet %r.', outbound_pkt)
 
             sock.sendall(outbound_pkt.to_bytes())

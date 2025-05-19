@@ -33,7 +33,7 @@ def stoken_encode(ip: IPv4Address | IPv6Address, port: int, default_port: Option
 
     blob: bytes = (
         struct.pack('>I', int(ip))
-        if type(ip) is IPv4Address else
+        if isinstance(ip, IPv4Address) else
         int(ip).to_bytes(16, byteorder='big')
     )
 

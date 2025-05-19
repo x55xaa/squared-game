@@ -112,7 +112,7 @@ class TCPServer:
 
     def _handle_client(self, sock: socket) -> None:
         identity: UUID = self._connections[sock]
-        
+
         logger.debug('player (%s) has joined the server.', identity)
 
         self._init_player_attributes(identity)
@@ -143,7 +143,7 @@ class TCPServer:
                 for packet_filter in self.filters:
                     if not packet_filter(identity, packet, self._state):
                         logger.debug('packet filtered (%s) %r.', identity, packet)
-                        
+
                         break
                 else:
                     match packet.type:

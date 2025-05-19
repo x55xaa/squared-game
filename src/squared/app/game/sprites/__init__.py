@@ -26,4 +26,3 @@ class BaseSprite(Sprite):
     """
 
     __blit__: list
-

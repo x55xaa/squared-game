@@ -52,6 +52,6 @@ def main(namespace: Namespace) -> None:
         game_server.start()
     elif namespace.connect:
         server_address = str(namespace.connect[0]), namespace.connect[1]
-        
+
     game_client = TCPClient(server_address)
     game.run(game_client)

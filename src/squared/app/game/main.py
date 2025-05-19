@@ -36,13 +36,13 @@ BOUNDS: Final[tuple[int, int]] = (720, 480)
 
 def get_main_player() -> MainPlayer:
     """Returns the local player."""
-    
+
     return PLAYERS[UUID(int=0)]
 
 
 def on_player_join_action(identity: UUID, attributes: PlayerAttributes) -> None:
     """Function that gets called on player join."""
-    
+
     if int(identity) == 0:
         PLAYERS[identity].set_attributes(attributes)
     else:
@@ -51,7 +51,7 @@ def on_player_join_action(identity: UUID, attributes: PlayerAttributes) -> None:
 
 def on_player_leave_action(identity: UUID) -> None:
     """Function that gets called on player leave."""
-    
+
     if int(identity) == 0:
         return
 
@@ -60,7 +60,7 @@ def on_player_leave_action(identity: UUID) -> None:
 
 def on_player_move_action(identity: UUID, position: PlayerPosition) -> None:
     """Function that gets called on player move."""
-    
+
     if int(identity) == 0:
         return
 
@@ -96,7 +96,7 @@ def main(screen: Surface, fps: int) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
                     get_main_player().set_velocity(y=-200 * dt)
@@ -106,11 +106,11 @@ def main(screen: Surface, fps: int) -> None:
                     get_main_player().set_velocity(x=-200 * dt)
                 elif event.key == pygame.K_d:
                     get_main_player().set_velocity(x=200 * dt)
-            
+
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_w or event.key == pygame.K_s:
+                if event.key in (pygame.K_w, pygame.K_s):
                     get_main_player().set_velocity(y=0)
-                elif event.key == pygame.K_a or event.key == pygame.K_d:
+                elif event.key in (pygame.K_a, pygame.K_d):
                     get_main_player().set_velocity(x=0)
 
         for p in PLAYERS.values():
@@ -118,7 +118,7 @@ def main(screen: Surface, fps: int) -> None:
             screen.blit(*p.__blit__)
 
         pygame.display.update()
-    
+
 
 def run(client: TCPClient) -> None:
     """Runs the game.
