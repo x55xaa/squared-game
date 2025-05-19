@@ -26,7 +26,7 @@ from ..game.sprites.player import PlayerAttributes
 
 
 class PacketType(IntEnum):
-    """"""
+    """Enum containing all possible packet types."""
 
     EMBEDDED = auto()
     JOIN = auto()
@@ -36,10 +36,17 @@ class PacketType(IntEnum):
 
 
 class Packet:
-    """"""
+    """A generic packet."""
 
     def __init__(self, type: PacketType, length: int, data: bytes):
-        """"""
+        """Args:
+            type:
+                the packet type
+            length:
+                the length of the packet's data.
+            data:
+                 the packet's data.
+        """
 
         if (actual_length := len(data)) != length:
             raise ValueError(
@@ -52,7 +59,7 @@ class Packet:
 
     @classmethod
     def from_socket(cls, stream: socket):
-        """"""
+        """Builds a packet by reading a socket."""
 
         blob: bytes = stream.recv(2)
         if not blob:
@@ -74,7 +81,7 @@ class Packet:
 
     @classmethod
     def from_bytes(cls, bytes: bytes):
-        """"""
+        """Builds a packet by reading a bytearray."""
 
         if len(bytes) < 6:
             raise ValueError('packet too short')
@@ -86,7 +93,7 @@ class Packet:
         return cls(packet_type, packet_length, packet_data)
 
     def to_bytes(self) -> bytes:
-        """"""
+        """Serializes a packet to bytes."""
 
         return (
             self.type.to_bytes(2, byteorder='big') +
@@ -95,7 +102,7 @@ class Packet:
         )
 
     def parse(self) -> Self:
-        """"""
+        """Parse a generic packet into a specific type."""
 
         match self.type:
             case PacketType.EMBEDDED:
@@ -115,19 +122,19 @@ class Packet:
 
     @property
     def type(self) -> PacketType:
-        """"""
+        """The packet type."""
 
         return self._type
 
     @property
     def length(self) -> int:
-        """"""
+        """The packet's data length."""
 
         return self._length
 
     @property
     def data(self) -> bytes:
-        """"""
+        """Tha packet's data."""
 
         return self._data
 
@@ -136,7 +143,7 @@ class Packet:
 
 
 class EmbeddedPacket(Packet):
-    """"""
+    """A packet that contains another packet with an assigned identity."""
 
     def __init__(self, *args, **kwargs):
         """"""
@@ -150,7 +157,14 @@ class EmbeddedPacket(Packet):
 
     @classmethod
     def from_packet(cls, identity: UUID, packet: Packet):
-        """"""
+        """Creates a new embedded packet from a packet.
+
+        Args:
+            identity:
+                the identity of the packet.
+            packet:
+                the packet to create the embedded packet from.
+        """
 
         packet_data: bytes = (
                 int(identity).to_bytes(16, byteorder='big') +
@@ -161,19 +175,19 @@ class EmbeddedPacket(Packet):
 
     @property
     def identity(self) -> UUID:
-        """"""
+        """The packet's identity."""
 
         return self._id
 
     @property
     def embed(self) -> Packet:
-        """"""
+        """The embedded packet."""
 
         return self._embedded_packet
 
 
 class JoinPacket(Packet):
-    """"""
+    """A packet that signals a player joining the server."""
 
     def __init__(self, *args, **kwargs):
         """"""
@@ -190,7 +204,7 @@ class JoinPacket(Packet):
 
     @classmethod
     def from_attributes(cls, attributes: PlayerAttributes):
-        """"""
+        """Creates a new join packet from a player's attributes."""
 
         packet_data: bytes = (
             struct.pack('>3B', *attributes['color']) +
@@ -202,17 +216,17 @@ class JoinPacket(Packet):
 
     @property
     def attributes(self) -> PlayerAttributes:
-        """"""
+        """The new player's attributes."""
 
         return self._attributes
 
 
 class LeavePacket(Packet):
-    """"""
+    """A packet that signals a player leaving the server."""
 
     @classmethod
     def new(cls):
-        """"""
+        """Creates a new leave packet."""
 
         return cls(PacketType.LEAVE, 0, b'')
 
@@ -241,7 +255,7 @@ class MessagePacket(Packet):
 
 
 class PositionPacket(Packet):
-    """"""
+    """A packet that contains a player's position."""
 
     def __init__(self, *args, **kwargs):
         """"""
@@ -252,18 +266,18 @@ class PositionPacket(Packet):
 
     @classmethod
     def from_coordinates(cls, x: int, y: int):
-        """"""
+        """Creates a new position packet given a pair of coordinates."""
 
         return cls(PacketType.POSITION, 4, struct.pack('>2H', x, y))
 
     @property
     def x(self) -> int:
-        """"""
+        """The x coordinate contained inside the packet."""
 
         return self._x
 
     @property
     def y(self) -> int:
-        """"""
+        """The y coordinate contained inside the packet."""
 
         return self._y

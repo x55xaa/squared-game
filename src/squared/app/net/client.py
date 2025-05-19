@@ -33,23 +33,37 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class TCPClient:
+    """TCP client used to communicate with the game server."""
+
     _outbound_packets_queue: Queue = field(init=False, default=Queue())
     address: tuple[str, int]
     callbacks: list[ClientCallback] = field(default_factory=lambda: [])
 
     def start(self) -> None:
-        """"""
+        """Starts the client."""
 
         thread = Thread(target=TCPClient._handle_client, args=(self,))
         thread.start()
 
     def send_packet(self, packet: Packet) -> None:
-        """"""
+        """Sends a packet to the game server.
+
+        Args:
+            packet:
+                the packet to send.
+        """
 
         self._outbound_packets_queue.put(packet)
 
     def update_position(self, x: int, y: int) -> None:
-        """"""
+        """Updates the local player's position.
+
+        Args:
+            x:
+                the x coordinate of the player.
+            y:
+                the y coordinate of the player.
+        """
 
         self.send_packet(PositionPacket.from_coordinates(x, y))
 
@@ -104,11 +118,21 @@ class TCPClient:
             sock.sendall(outbound_pkt.to_bytes())
 
     def add_callback(self, callback: ClientCallback) -> None:
-        """"""
+        """Adds a callback function to the client.
+
+        Args:
+            callback:
+                the callback function to add.
+        """
 
         self.callbacks.append(callback)
 
     def remove_callback(self, callback: ClientCallback) -> None:
-        """"""
+        """Removes a callback function from the client.
+
+        Args:
+            callback:
+                the callback function to remove.
+        """
 
         self.callbacks.remove(callback)

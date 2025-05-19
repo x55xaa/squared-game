@@ -43,10 +43,15 @@ class PlayerAttributes(TypedDict):
 
 
 class BasePlayer(ABC, BaseSprite):
-    """"""
+    """Base player class."""
 
     def __init__(self, identity: UUID, bounds: PlayerBounds):
-        """"""
+        """Args:
+            identity:
+                the UUID identifying the player.
+            bounds:
+                the area in which the player can move.
+        """
 
         super().__init__()
 
@@ -66,34 +71,45 @@ class BasePlayer(ABC, BaseSprite):
 
     @property
     def surface(self) -> Surface:
-        """"""
+        """The player surface."""
 
         return self._surface
 
     @property
     def rect(self) -> Rect:
-        """"""
+        """The player rect."""
 
         return self._rect
 
     @property
     def x(self) -> int:
-        """"""
+        """The x coordinate of the player."""
 
         return self._rect.x
 
     @property
     def y(self) -> int:
-        """"""
+        """The y coordinate of the player."""
 
         return self._rect.y
 
 
 class RemotePlayer(BasePlayer):
-    """"""
+    """Represents a remote player."""
 
     def __init__(self, identity: UUID, bounds: PlayerBounds, color: PlayerColor, position: PlayerPosition, size: PlayerSize):
-        """"""
+        """Args:
+            identity:
+                the UUID identifying the player.
+            bounds:
+                the area in which the player can move.
+            color:
+                the color of the player.
+            position:
+                the position of the player.
+            size:
+                the size of the player.
+        """
 
         super().__init__(identity, bounds)
 
@@ -106,12 +122,12 @@ class RemotePlayer(BasePlayer):
         self.__blit__ = [self._surface, self._rect]
 
     def update(self) -> None:
-        """"""
+        """Updates the player's position."""
 
         self._rect.move_ip(self._position[0] - self.x, self._position[1] - self.y)
 
     def set_position(self, x: Optional[int] = None, y: Optional[int] = None) -> None:
-        """"""
+        """Sets the player's location."""
 
         if x is not None and y is not None:
             new_position = (x, y)
@@ -135,10 +151,17 @@ class RemotePlayer(BasePlayer):
 
 
 class MainPlayer(BasePlayer):
-    """"""
+    """Represents the local player."""
 
     def __init__(self, identity: UUID, bounds: PlayerBounds, client):
-        """"""
+        """Args:
+            identity:
+                the UUID identifying the player.
+            bounds:
+                the area in which the player can move.
+            client:
+                the TCP client used to communicate with the game server.
+        """
 
         super().__init__(identity, bounds)
 
@@ -148,7 +171,7 @@ class MainPlayer(BasePlayer):
         self._velocity: PlayerVelocity = (0 ,0)
 
     def update(self) -> None:
-        """"""
+        """Updates the player's position."""
 
         new_rect = Rect(self.x + self._velocity[0], self.y + self._velocity[1], *self._surface.get_size())
         if self._bounds.contains(new_rect):
@@ -167,7 +190,7 @@ class MainPlayer(BasePlayer):
                     self._prev_position = (self.x, self.y)
     
     def set_attributes(self, attributes: PlayerAttributes) -> None:
-        """"""
+        """Sets the player's attributes."""
 
         self._surface = Surface(attributes['size'])
         self._surface.fill(attributes['color'])
@@ -179,7 +202,7 @@ class MainPlayer(BasePlayer):
         self.__blit__ = [self._surface, self._rect]
 
     def set_velocity(self, x: Optional[float] = None, y: Optional[float] = None) -> None:
-        """"""
+        """Sets the player's velocity."""
 
         if x is not None and y is not None:
             new_velocity = (x, y)

@@ -28,7 +28,12 @@ type ClientCallback = Callable[[UUID, Packet], Packet | None]
 
 
 def on_player_join(action: Callable[[UUID, PlayerAttributes], None]) -> ClientCallback:
-    """"""
+    """Returns a client callback that runs on player join.
+
+    Args:
+        action:
+            the function to run on player join.
+    """
 
     def callback(identity: UUID, packet: Packet) -> Packet | None:
         if not isinstance(packet, JoinPacket):
@@ -40,7 +45,12 @@ def on_player_join(action: Callable[[UUID, PlayerAttributes], None]) -> ClientCa
 
 
 def on_player_leave(action: Callable[[UUID], None]) -> ClientCallback:
-    """"""
+    """Returns a client callback that runs on player leave.
+
+    Args:
+        action:
+            the function to run on player leave.
+    """
 
     def callback(identity: UUID, packet: Packet) -> Packet | None:
         if not isinstance(packet, LeavePacket):
@@ -52,7 +62,12 @@ def on_player_leave(action: Callable[[UUID], None]) -> ClientCallback:
 
 
 def on_player_move(action: Callable[[UUID, PlayerPosition], None]) -> ClientCallback:
-    """"""
+    """Returns a client callback that runs on player move.
+
+    Args:
+        action:
+            the function to run on player move.
+    """
 
     def callback(identity: UUID, packet: Packet) -> Packet | None:
         if not isinstance(packet, PositionPacket):

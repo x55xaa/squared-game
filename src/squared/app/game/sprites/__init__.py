@@ -20,5 +20,10 @@ from pygame.sprite import Sprite
 
 
 class BaseSprite(Sprite):
+    """Base Sprite class that adds the `__blit__` dunder attribute.
+
+    The `__blit__` attribute should contain every attribute of the sprite that needs to be displayed on the screen.
+    """
+
     __blit__: list
 

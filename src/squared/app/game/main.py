@@ -35,13 +35,13 @@ BOUNDS: Final[tuple[int, int]] = (720, 480)
 
 
 def get_main_player() -> MainPlayer:
-    """"""
+    """Returns the local player."""
     
     return PLAYERS[UUID(int=0)]
 
 
 def on_player_join_action(identity: UUID, attributes: PlayerAttributes) -> None:
-    """"""
+    """Function that gets called on player join."""
     
     if int(identity) == 0:
         PLAYERS[identity].set_attributes(attributes)
@@ -50,7 +50,7 @@ def on_player_join_action(identity: UUID, attributes: PlayerAttributes) -> None:
 
 
 def on_player_leave_action(identity: UUID) -> None:
-    """"""
+    """Function that gets called on player leave."""
     
     if int(identity) == 0:
         return
@@ -59,7 +59,7 @@ def on_player_leave_action(identity: UUID) -> None:
 
 
 def on_player_move_action(identity: UUID, position: PlayerPosition) -> None:
-    """"""
+    """Function that gets called on player move."""
     
     if int(identity) == 0:
         return
@@ -69,7 +69,7 @@ def on_player_move_action(identity: UUID, position: PlayerPosition) -> None:
 
 
 def init(title: str, size: tuple[int, int]) -> Surface:
-    """"""
+    """Initializes the game."""
 
     successes, failures = pygame.init()
 
@@ -83,7 +83,7 @@ def init(title: str, size: tuple[int, int]) -> Surface:
 
 
 def main(screen: Surface, fps: int) -> None:
-    """"""
+    """Starts the game."""
 
     clock = pygame.time.Clock()
 
@@ -121,7 +121,12 @@ def main(screen: Surface, fps: int) -> None:
     
 
 def run(client: TCPClient) -> None:
-    """"""
+    """Runs the game.
+
+    Args:
+        client:
+            the TCP client used to communicate with the game server.
+    """
 
     PLAYERS[UUID(int=0)] = MainPlayer(UUID(int=0), (0, 0, *BOUNDS), client)
 

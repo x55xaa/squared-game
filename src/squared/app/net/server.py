@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class TCPServer:
-    """"""
+    """TCP server that functions as the game server."""
 
     _backlog: int = field(default_factory=lambda: 16, init=False)
     _connections: dict[socket, UUID] = field(default_factory=lambda: {}, init=False)
@@ -51,20 +51,17 @@ class TCPServer:
     )
 
     def start(self) -> None:
-        """"""
+        """Starts the server."""
 
         thread = Thread(target=TCPServer._handle_server, args=(self,))
         thread.start()
 
     def _forward_packet(self, source: socket, packet: Packet) -> None:
-        """"""
-
         for s in self._connections:
             if s != source:
                 s.sendall(packet.to_bytes())
 
     def _init_player_attributes(self, identity: UUID) -> None:
-
         new_player_position: PlayerPosition = (0, 0)
 
         spawn_found: bool = False
@@ -177,6 +174,6 @@ class TCPServer:
             sock.close()
 
     def add_filter(self, packet_filter: PacketFilter) -> None:
-        """"""
+        """Adds a packet filter to the server."""
 
         self.filters.append(packet_filter)
