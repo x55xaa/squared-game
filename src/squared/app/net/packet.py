@@ -31,7 +31,6 @@ class PacketType(IntEnum):
     EMBEDDED = auto()
     JOIN = auto()
     LEAVE = auto()
-    MESSAGE = auto()
     POSITION = auto()
 
 
@@ -111,8 +110,6 @@ class Packet:
                 con = JoinPacket
             case PacketType.LEAVE:
                 con = LeavePacket
-            case PacketType.MESSAGE:
-                con = MessagePacket
             case PacketType.POSITION:
                 con = PositionPacket
             case _:
@@ -229,29 +226,6 @@ class LeavePacket(Packet):
         """Creates a new leave packet."""
 
         return cls(PacketType.LEAVE, 0, b'')
-
-
-class MessagePacket(Packet):
-    """"""
-
-    def __init__(self, *args, **kwargs):
-        """"""
-
-        super().__init__(*args, **kwargs)
-
-        self._message = self.data.decode()
-
-    @classmethod
-    def from_message(cls, msg: str):
-        """"""
-
-        return cls(PacketType.MESSAGE, len(msg), msg.encode())
-
-    @property
-    def message(self) -> str:
-        """"""
-
-        return self._message
 
 
 class PositionPacket(Packet):
