@@ -24,11 +24,12 @@ import struct
 from threading import Thread
 from uuid import UUID, uuid4
 
+from pygame import Rect
+
 from .filters import PacketFilter, player_collision_filter, position_filter, whitelist_packets
 from .packet import Packet, PacketType, EmbeddedPacket, LeavePacket, JoinPacket
 from ..game.main import BOUNDS
-from ..game.sprites.player import PLAYER_SIZE, PlayerAttributes
-
+from ..game.sprites.player import PLAYER_SIZE, PlayerAttributes, PlayerPosition
 
 logger = logging.getLogger(__name__)
 
@@ -63,9 +64,25 @@ class TCPServer:
                 s.sendall(packet.to_bytes())
 
     def _init_player_attributes(self, identity: UUID) -> None:
+
+        new_player_position: PlayerPosition = (0, 0)
+
+        spawn_found: bool = False
+        while not spawn_found:
+            new_player_position = randint(0, BOUNDS[0]), randint(0, BOUNDS[1])
+            new_player_rect = Rect(*new_player_position, *PLAYER_SIZE)
+
+            for other_player in self._state.values():
+                other_player_rect = Rect(*other_player['position'], *other_player['size'])
+
+                if other_player_rect.colliderect(new_player_rect):
+                    break
+            else:
+                spawn_found = True
+
         self._state[identity] = PlayerAttributes(**{
             'color': tuple(randint(64, 255) for _ in range(3)),
-            'position': (0, 0),
+            'position': new_player_position,
             'size': PLAYER_SIZE,
         })
 

@@ -173,7 +173,8 @@ class MainPlayer(BasePlayer):
         self._surface.fill(attributes['color'])
 
         self._rect = self._surface.get_rect()
-        self._rect.move(*attributes['position'])
+        self._rect.update(*attributes['position'], *attributes['size'])
+        self._prev_position = (self._rect.x, self._rect.y)
 
         self.__blit__ = [self._surface, self._rect]
 
