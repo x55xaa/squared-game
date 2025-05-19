@@ -180,13 +180,13 @@ class JoinPacket(Packet):
 
         super().__init__(*args, **kwargs)
 
-        self._attributes: PlayerAttributes = {}
-
         r, g, b = struct.unpack('>3B', self.data[:3])
         x, y = struct.unpack('>2H', self.data[3:7])
 
-        self._attributes['color'] = (r, g, b)
-        self._attributes['position'] = (x, y)
+        self._attributes: PlayerAttributes = {
+            'color': (r, g, b),
+            'position': (x, y),
+        }
 
     @classmethod
     def from_attributes(cls, attributes: PlayerAttributes):
