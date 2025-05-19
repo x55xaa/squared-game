@@ -16,90 +16,98 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from abc import ABC, abstractmethod
-from typing import TypedDict, Optional, Union
-from uuid import UUID
+from typing import TypedDict, Optional
 
 from pygame import Surface, Rect
 
 from . import BaseSprite
 
 
+type PlayerBounds = tuple[int, int, int, int]
 type PlayerColor = tuple[int, int, int]
 type PlayerPosition = tuple[int, int]
+type PlayerSize = tuple[int, int]
 type PlayerVelocity = tuple[float, float]
-
-
-PLAYERS: dict[UUID, Union['MainPlayer', 'RemotePlayer']] = {}
 
 
 class PlayerAttributes(TypedDict):
     color: PlayerColor
     position: PlayerPosition
+    size: PlayerSize
 
 
-class BasePlayer(ABC, BaseSprite):
+class BasePlayer(BaseSprite):
     """"""
 
-    def __init__(self):
+    def __init__(self, bounds: PlayerBounds):
         """"""
 
         super().__init__()
 
-        self._body_surface = Surface((32, 32))
-        self._body_surface.fill((0, 0, 0))
-        self._body_rect = self._body_surface.get_rect()
+        self._surface = Surface((0, 0))
+        self._surface.fill((0, 0, 0))
+        self._rect = self._surface.get_rect()
         
-        self.__blit__ = [self._body_surface, self._body_rect]
-    
-    def grown(message: str) -> None:
-        pass
+        self._bounds = bounds
         
-    
-    @abstractmethod
-    def update(self) -> None:
-        ...
+        self.__blit__ = [self._surface, self._rect]
+
+    def update(self) -> bool:
+        """"""
+        
+        if not Rect(*self._bounds).contains(self._rect):
+            return False
+
+        return True
     
     @property
     def surface(self) -> Surface:
         """"""
 
-        return self._body_surface
+        return self._surface
 
     @property
     def rect(self) -> Rect:
         """"""
 
-        return self._body_rect
+        return self._rect
 
     @property
     def x(self) -> int:
         """"""
 
-        return self._body_rect.x
+        return self._rect.x
 
     @property
     def y(self) -> int:
         """"""
 
-        return self._body_rect.y
+        return self._rect.y
 
 
 class RemotePlayer(BasePlayer):
     """"""
 
-    def __init__(self, color: PlayerColor, position: PlayerPosition):
+    def __init__(self, bounds: PlayerBounds, color: PlayerColor, position: PlayerPosition, size: PlayerSize):
         """"""
 
-        super().__init__()
+        super().__init__(bounds)
 
-        self._body_surface.fill(color)
         self._position: PlayerPosition = position
 
-    def update(self) -> None:
+        self._surface = Surface(size)
+        self._surface.fill(color)
+        self._rect = self._surface.get_rect()
+
+    def update(self) -> bool:
         """"""
-        
-        self._body_rect.move_ip(self._position[0] - self.x, self._position[1] - self.y)
+
+        if self.update():
+            self._rect.move_ip(self._position[0] - self.x, self._position[1] - self.y)
+
+            return True
+
+        return False
 
     def set_position(self, x: Optional[int] = None, y: Optional[int] = None) -> None:
         """"""
@@ -115,30 +123,39 @@ class RemotePlayer(BasePlayer):
 class MainPlayer(BasePlayer):
     """"""
 
-    def __init__(self, client):
+    def __init__(self, bounds: PlayerBounds, client):
         """"""
 
-        super().__init__()
+        super().__init__(bounds)
 
         self._client = client
+
         self._prev_position = (0, 0)
         self._velocity: PlayerVelocity = (0 ,0)
 
-    def update(self) -> None:
+    def update(self) -> bool:
         """"""
 
-        self._body_rect.move_ip(*self._velocity)
-        
-        if self._prev_position != (self.x, self.y):
-            self._client.update_position(self.x, self.y)
-        
-        self._prev_position = (self.x, self.y)
+        if self.update():
+            self._rect.move_ip(*self._velocity)
+
+            if self._prev_position != (self.x, self.y):
+                self._client.update_position(self.x, self.y)
+
+                self._prev_position = (self.x, self.y)
+
+            return True
+
+        return False
     
     def set_attributes(self, attributes: PlayerAttributes) -> None:
         """"""
-        
-        self._body_surface.fill(attributes['color'])
-        self._body_rect.move(*attributes['position'])
+
+        self._surface = Surface(attributes['size'])
+        self._surface.fill(attributes['color'])
+
+        self._rect = self._surface.get_rect()
+        self._rect.move(*attributes['position'])
         
     def set_velocity(self, x: Optional[float] = None, y: Optional[float] = None) -> None:
         """"""
