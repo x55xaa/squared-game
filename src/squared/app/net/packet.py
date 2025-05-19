@@ -191,7 +191,7 @@ class JoinPacket(Packet):
 
         super().__init__(*args, **kwargs)
 
-        r, g, b, x, y, width, height = struct.unpack('>3B2H2B', self.data[:9])
+        r, g, b, x, y, width, height = struct.unpack('>3B2f2B', self.data[:13])
 
         self._attributes: PlayerAttributes = {
             'color': (r, g, b),
@@ -205,7 +205,7 @@ class JoinPacket(Packet):
 
         packet_data: bytes = (
             struct.pack('>3B', *attributes['color']) +
-            struct.pack('>2H', *attributes['position']) +
+            struct.pack('>2f', *attributes['position']) +
             struct.pack('>2B', *attributes['size'])
         )
 
@@ -236,22 +236,22 @@ class PositionPacket(Packet):
 
         super().__init__(*args, **kwargs)
 
-        self._x, self._y = struct.unpack('>2H', self.data)
+        self._x, self._y = struct.unpack('>2f', self.data)
 
     @classmethod
-    def from_coordinates(cls, x: int, y: int):
+    def from_coordinates(cls, x: float, y: float):
         """Creates a new position packet given a pair of coordinates."""
 
-        return cls(PacketType.POSITION, 4, struct.pack('>2H', x, y))
+        return cls(PacketType.POSITION, 8, struct.pack('>2f', x, y))
 
     @property
-    def x(self) -> int:
+    def x(self) -> float:
         """The x coordinate contained inside the packet."""
 
         return self._x
 
     @property
-    def y(self) -> int:
+    def y(self) -> float:
         """The y coordinate contained inside the packet."""
 
         return self._y

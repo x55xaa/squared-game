@@ -26,7 +26,7 @@ from . import BaseSprite
 
 type PlayerBounds = tuple[int, int, int, int]
 type PlayerColor = tuple[int, int, int]
-type PlayerPosition = tuple[int, int]
+type PlayerPosition = tuple[float, float]
 type PlayerSize = tuple[int, int]
 type PlayerVelocity = tuple[float, float]
 
@@ -79,13 +79,13 @@ class BasePlayer(BaseSprite):
         return self._rect
 
     @property
-    def x(self) -> int:
+    def x(self) -> float:
         """The x coordinate of the player."""
 
         return self._rect.x
 
     @property
-    def y(self) -> int:
+    def y(self) -> float:
         """The y coordinate of the player."""
 
         return self._rect.y
@@ -125,7 +125,7 @@ class RemotePlayer(BasePlayer):
 
         self._rect.move_ip(self._position[0] - self.x, self._position[1] - self.y)
 
-    def set_position(self, x: Optional[int] = None, y: Optional[int] = None) -> None:
+    def set_position(self, x: Optional[float] = None, y: Optional[float] = None) -> None:
         """Sets the player's location."""
 
         if x is not None and y is not None:
@@ -166,8 +166,8 @@ class MainPlayer(BasePlayer):
 
         self._client = client
 
-        self._prev_position = (0, 0)
-        self._velocity: PlayerVelocity = (0 ,0)
+        self._prev_position = (0.0, 0.0)
+        self._velocity: PlayerVelocity = (0.0, 0.0)
 
     def update(self, *args, **kwargs) -> None:
         """Updates the player's position."""

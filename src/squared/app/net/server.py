@@ -18,7 +18,7 @@
 
 from dataclasses import dataclass, field
 import logging
-from random import randint
+from random import randint, random
 from socket import AF_INET, error as socket_error, SOCK_STREAM, socket
 import struct
 from threading import Thread
@@ -62,11 +62,11 @@ class TCPServer:
                 s.sendall(packet.to_bytes())
 
     def _init_player_attributes(self, identity: UUID) -> None:
-        new_player_position: PlayerPosition = (0, 0)
+        new_player_position: PlayerPosition = (0.0, 0.0)
 
         spawn_found: bool = False
         while not spawn_found:
-            new_player_position = randint(0, BOUNDS[0] - PLAYER_SIZE[0]), randint(0, BOUNDS[1] - PLAYER_SIZE[1])
+            new_player_position = random() * (BOUNDS[0] - PLAYER_SIZE[0]), random() * (BOUNDS[1] - PLAYER_SIZE[1])
             new_player_rect = Rect(*new_player_position, *PLAYER_SIZE)
 
             for other_player in self._state.values():
@@ -149,7 +149,7 @@ class TCPServer:
                     match packet.type:
                         case PacketType.POSITION:
                             logger.debug(
-                                'update player (%s) position (%d, %d) -> (%d, %d).',
+                                'update player (%s) position (%.2f, %.2f) -> (%.2f, %.2f).',
                                 identity, *self._state[identity]['position'], packet.x, packet.y
                             )
 
