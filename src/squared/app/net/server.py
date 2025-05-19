@@ -65,6 +65,7 @@ class TCPServer:
         self._state[identity] = PlayerAttributes(**{
             'color': tuple(randint(64, 255) for _ in range(3)),
             'position': (0, 0),
+            'size': (32, 32),
         })
 
     def _handle_server(self) -> None:
@@ -121,7 +122,7 @@ class TCPServer:
                 except (struct.error, ValueError):
                     logger.warning('discarding malformed packet from (%s).', identity)
                     continue
-                
+
                 logger.debug('received packet from (%s) %r.', identity, packet)
 
                 for packet_filter in self.filters:
