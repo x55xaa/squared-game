@@ -16,6 +16,7 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+from os import environ
 from colorama import just_fix_windows_console
 
 from .modules.metadata import authors, summary, version
@@ -36,4 +37,5 @@ __version__: str = version()
 """The package version."""
 
 
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 just_fix_windows_console()
