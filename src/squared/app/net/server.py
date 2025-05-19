@@ -46,7 +46,7 @@ class TCPServer:
         default_factory=lambda: [
             player_collision_filter(),
             position_filter(0, 0, *BOUNDS),
-            whitelist_packets(PacketType.MESSAGE, PacketType.POSITION),
+            whitelist_packets(PacketType.POSITION),
         ],
     )
 
