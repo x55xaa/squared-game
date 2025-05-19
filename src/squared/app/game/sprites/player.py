@@ -16,6 +16,7 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+from abc import ABC, abstractmethod
 from typing import TypedDict, Optional
 
 from pygame import Surface, Rect
@@ -36,7 +37,7 @@ class PlayerAttributes(TypedDict):
     size: PlayerSize
 
 
-class BasePlayer(BaseSprite):
+class BasePlayer(ABC, BaseSprite):
     """"""
 
     def __init__(self, bounds: PlayerBounds):
@@ -48,18 +49,14 @@ class BasePlayer(BaseSprite):
         self._surface.fill((0, 0, 0))
         self._rect = self._surface.get_rect()
         
-        self._bounds = bounds
+        self._bounds = Rect(*bounds)
         
         self.__blit__ = [self._surface, self._rect]
 
-    def update(self) -> bool:
-        """"""
-        
-        if not Rect(*self._bounds).contains(self._rect):
-            return False
+    @abstractmethod
+    def update(self) -> None:
+        ...
 
-        return True
-    
     @property
     def surface(self) -> Surface:
         """"""
@@ -101,25 +98,25 @@ class RemotePlayer(BasePlayer):
 
         self.__blit__ = [self._surface, self._rect]
 
-    def update(self) -> bool:
+    def update(self) -> None:
         """"""
 
-        if super().update():
-            self._rect.move_ip(self._position[0] - self.x, self._position[1] - self.y)
-
-            return True
-
-        return False
+        self._rect.move_ip(self._position[0] - self.x, self._position[1] - self.y)
 
     def set_position(self, x: Optional[int] = None, y: Optional[int] = None) -> None:
         """"""
 
         if x is not None and y is not None:
-            self._position = (x, y)
+            new_position = (x, y)
         elif x is not None:
-            self._position = (x, self._position[1])
+            new_position = (x, self._position[1])
         elif y is not None:
-            self._position = (self._position[0], y)
+            new_position = (self._position[0], y)
+        else:
+            new_position = self._position
+
+        if self._bounds.contains(Rect(*new_position, *self._surface.get_size())):
+            self._position = new_position
 
 
 class MainPlayer(BasePlayer):
@@ -135,25 +132,20 @@ class MainPlayer(BasePlayer):
         self._prev_position = (0, 0)
         self._velocity: PlayerVelocity = (0 ,0)
 
-    def update(self) -> bool:
+    def update(self) -> None:
         """"""
 
-        if super().update():
+        if self._bounds.contains(Rect(self.x + self._velocity[0], self.y + self._velocity[1], *self._surface.get_size())):
+
             self._rect.move_ip(*self._velocity)
 
             if self._prev_position != (self.x, self.y):
                 self._client.update_position(self.x, self.y)
 
                 self._prev_position = (self.x, self.y)
-
-            return True
-
-        return False
     
     def set_attributes(self, attributes: PlayerAttributes) -> None:
         """"""
-
-        print(attributes)
 
         self._surface = Surface(attributes['size'])
         self._surface.fill(attributes['color'])
@@ -162,13 +154,18 @@ class MainPlayer(BasePlayer):
         self._rect.move(*attributes['position'])
 
         self.__blit__ = [self._surface, self._rect]
-        
+
     def set_velocity(self, x: Optional[float] = None, y: Optional[float] = None) -> None:
         """"""
 
         if x is not None and y is not None:
-            self._velocity = (x, y)
+            new_velocity = (x, y)
         elif x is not None:
-            self._velocity = (x, self._velocity[1])
+            new_velocity = (x, self._velocity[1])
         elif y is not None:
-            self._velocity = (self._velocity[0], y)
+            new_velocity = (self._velocity[0], y)
+        else:
+            new_velocity = self._velocity
+
+        if self._bounds.contains(Rect(self.x + new_velocity[0], self.y + new_velocity[1], *self._surface.get_size())):
+            self._velocity = new_velocity
