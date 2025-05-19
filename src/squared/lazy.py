@@ -22,6 +22,8 @@ from collections.abc import Mapping
 # Guangyang Li (November 9 2017). Set up a dictionary lazily. Stackoverflow.
 # https://stackoverflow.com/a/47212782.
 class LazyDict(Mapping):
+    """Lazy implementation of dict."""
+
     def __init__(self, *args, **kw):
         self._data = dict(*args, **kw)
 
