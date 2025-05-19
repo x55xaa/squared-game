@@ -18,12 +18,15 @@
 
 
 from collections.abc import Callable
+from typing import Optional
+from uuid import UUID
+
 from pygame import Rect
 
-from ..game.sprites.player import PLAYER_SIZE
+from ..game.sprites.player import PLAYER_SIZE, PlayerAttributes
 from .packet import Packet, PacketType
 
-type PacketFilter = Callable[[Packet], bool]
+type PacketFilter = Callable[[UUID, Packet, Optional[dict[UUID, PlayerAttributes]]], bool]
 
 
 def whitelist_packets(*args: PacketType) -> PacketFilter:
@@ -34,7 +37,7 @@ def whitelist_packets(*args: PacketType) -> PacketFilter:
             a list of allowed packets.
     """
 
-    def packet_filter(pkt: Packet) -> bool:
+    def packet_filter(_identity: UUID, pkt: Packet, _state: Optional[dict[UUID, PlayerAttributes]] = None) -> bool:
         if pkt.type not in args:
             return False
 
@@ -57,7 +60,7 @@ def position_filter(left: int, top: int, w: int, h: int) -> PacketFilter:
             the height of the perimeter.
     """
 
-    def packet_filter(pkt: Packet) -> bool:
+    def packet_filter(_identity: UUID, pkt: Packet, _state: Optional[dict[UUID, PlayerAttributes]] = None) -> bool:
         if pkt.type != PacketType.POSITION:
             return True
 

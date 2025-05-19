@@ -126,7 +126,7 @@ class TCPServer:
                 logger.debug('received packet from (%s) %r.', identity, packet)
 
                 for packet_filter in self.filters:
-                    if not packet_filter(packet):
+                    if not packet_filter(identity, packet, self._state):
                         logger.debug('packet filtered (%s) %r.', identity, packet)
                         
                         break
