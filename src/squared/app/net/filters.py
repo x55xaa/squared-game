@@ -71,3 +71,32 @@ def position_filter(left: int, top: int, w: int, h: int) -> PacketFilter:
         return False
 
     return packet_filter
+
+
+def player_collision_filter() -> PacketFilter:
+    """Returns a packet filter that allows blocks position packets that would leed to overlapped players."""
+
+    def packet_filter(identity: UUID, pkt: Packet, state: Optional[dict[UUID, PlayerAttributes]] = None) -> bool:
+        if pkt.type != PacketType.POSITION:
+            return True
+
+        if not state:
+            return True
+
+        if not (this_player_attributes := state.get(identity, None)):
+            return False
+        this_player_new_rect = Rect(pkt.x, pkt.y, *this_player_attributes['size'])
+
+        for other_player_identity, other_player_attributes in state.items():
+            if identity == other_player_identity:
+                continue
+
+            other_player_rect = Rect(*other_player_attributes['position'], *other_player_attributes['size'])
+            if this_player_new_rect.colliderect(other_player_rect):
+                break
+        else:
+            return True
+
+        return False
+
+    return packet_filter

@@ -24,7 +24,7 @@ import struct
 from threading import Thread
 from uuid import UUID, uuid4
 
-from .filters import PacketFilter, position_filter, whitelist_packets
+from .filters import PacketFilter, player_collision_filter, position_filter, whitelist_packets
 from .packet import Packet, PacketType, EmbeddedPacket, LeavePacket, JoinPacket
 from ..game.main import BOUNDS
 from ..game.sprites.player import PLAYER_SIZE, PlayerAttributes
@@ -43,8 +43,9 @@ class TCPServer:
     address: (str, int)
     filters: list[PacketFilter] = field(
         default_factory=lambda: [
-            whitelist_packets(PacketType.MESSAGE, PacketType.POSITION),
+            player_collision_filter(),
             position_filter(0, 0, *BOUNDS),
+            whitelist_packets(PacketType.MESSAGE, PacketType.POSITION),
         ],
     )
 
