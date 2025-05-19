@@ -91,7 +91,7 @@ def connection_address(argument: str, default_port: int) -> NetworkAddress:
 
     try:
         return network_address_with_optional_port(argument, default_port)
-    except:
+    except ValueError:
         pass
 
     return server_token(argument, default_port)
