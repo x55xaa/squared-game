@@ -66,7 +66,7 @@ class TCPServer:
 
         spawn_found: bool = False
         while not spawn_found:
-            new_player_position = randint(0, BOUNDS[0]), randint(0, BOUNDS[1])
+            new_player_position = randint(0, BOUNDS[0] - PLAYER_SIZE[0]), randint(0, BOUNDS[1] - PLAYER_SIZE[1])
             new_player_rect = Rect(*new_player_position, *PLAYER_SIZE)
 
             for other_player in self._state.values():
