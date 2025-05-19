@@ -47,7 +47,7 @@ def on_player_join_action(identity: UUID, attributes: PlayerAttributes) -> None:
     if int(identity) == 0:
         PLAYERS[identity].set_attributes(attributes)
     else:
-        PLAYERS[identity] = RemotePlayer(**attributes)
+        PLAYERS[identity] = RemotePlayer((0, 0, *BOUNDS), **attributes)
 
 
 def on_player_leave_action(identity: UUID) -> None:
@@ -123,7 +123,7 @@ def main(screen: Surface, fps: int) -> None:
 def run(client: TCPClient) -> None:
     """"""
 
-    PLAYERS[UUID(int=0)] = MainPlayer(client)
+    PLAYERS[UUID(int=0)] = MainPlayer((0, 0, *BOUNDS), client)
 
     client.add_callback(on_player_join(on_player_join_action))
     client.add_callback(on_player_leave(on_player_leave_action))
